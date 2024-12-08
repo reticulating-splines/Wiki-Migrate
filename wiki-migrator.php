@@ -2,7 +2,8 @@
 /*
 Plugin Name: PMWiki to WordPress Migrator
 Description: Migrate entire PMWiki sites to WordPress pages using either HTTP or local files. Working with claude on this.
-Version: 2.1
+Version: 3.x
+Author: wad + claude
 */
 
 if (!defined('ABSPATH')) {
