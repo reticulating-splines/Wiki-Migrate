@@ -1,9 +1,8 @@
 <?php
 /*
 Plugin Name: PMWiki to WordPress Migrator
-Description: Migrate entire PMWiki sites to WordPress pages using either HTTP or local files. Working with claude on this.
-Version: 3.x
-Author: wad + claude
+Description: Migrate entire PMWiki sites to WordPress pages using either HTTP or local files
+Version: 2.0
 */
 
 if (!defined('ABSPATH')) {
@@ -28,14 +27,19 @@ class PMWikiMigrator {
 		$this->admin_interface = new AdminInterface($this->migration_processor);
 	}
 
-	private function create_migration_processor() {
+private function create_migration_processor() {
 		// Get settings to determine which processor to use
 		$settings = get_option('pmwiki_migrator_settings', array());
+		error_log('PMWiki Migrator Settings: ' . print_r($settings, true));
+		
 		$source_type = isset($settings['source_type']) ? $settings['source_type'] : 'http';
-
+		error_log('Selected source type: ' . $source_type);
+	
 		if ($source_type === 'files') {
+			error_log('Creating Files processor');
 			return new MigrationProcessorFiles($this->content_processor);
 		} else {
+			error_log('Creating HTTP processor');
 			return new MigrationProcessor($this->content_processor);
 		}
 	}

@@ -85,7 +85,7 @@ class AdminInterface {
 		
 		// Source type (http or files)
 		if (isset($input['source_type'])) {
-			$sanitized['source_type'] = in_array($input['source_type'], ['http', 'files']) ? $input['source_type'] : 'http';
+			$sanitized['source_type'] = in_array($input['source_type'], ['http', 'files']) ? $input['source_type'] : 'files';
 		}
 	
 		// Wiki source directory
@@ -224,8 +224,8 @@ class AdminInterface {
 								id="source_type" 
 								name="<?php echo esc_attr($this->option_name); ?>[source_type]"
 							>
-								<option value="http" <?php selected($settings['source_type'] ?? 'http', 'http'); ?>>HTTP (Scrape from website)</option>
-								<option value="files" <?php selected($settings['source_type'] ?? 'http', 'files'); ?>>Files (Local wiki.d directory)</option>
+								<option value="files" <?php selected($settings['source_type'] ?? 'files', 'files'); ?>>Files (Local wiki.d directory)</option>
+								<option value="http" <?php selected($settings['source_type'] ?? 'files', 'http'); ?>>HTTP (Scrape from website)</option>
 							</select>
 						</td>
 					</tr>
@@ -323,17 +323,22 @@ class AdminInterface {
 		if (!current_user_can('manage_options')) {
 			wp_die('Unauthorized access');
 		}
-
+	
 		$settings = isset($_POST[$this->option_name]) ? 
 			$this->sanitize_settings($_POST[$this->option_name]) : 
 			array();
-
+		
+		error_log('PMWiki Migration Request Settings: ' . print_r($settings, true));
+	
 		if (empty($settings['base_url'])) {
 			wp_die('Base URL is required');
 		}
-
+	
+		// Add this line to save the settings
+		update_option($this->option_name, $settings);
+	
 		$this->migration_processor->start_migration($settings);
-
+	
 		wp_redirect(add_query_arg(
 			'migration_started',
 			'true',
